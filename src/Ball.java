@@ -1,12 +1,14 @@
 
 public class Ball
 {
-	private int xPos,yPos;
-	public int dx = 5, dy = -5;
+	private int xPos, yPos;
+	public int dx, dy;
 	
 	public Ball()
 	{
 		setPos(PongMain.WIDTH / 2, PongMain.HEIGHT / 2);
+		dx = 5;
+		dy = -5;
 	}
 	
 	public void setPos(int x, int y)

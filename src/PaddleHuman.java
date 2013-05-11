@@ -1,22 +1,21 @@
-/*
- * This is the class for the human-controlled paddle
- */
 
 public class PaddleHuman
 {
-	int yPos = 0, height, score;
-	final int XPOS_LEFT = 30, XPOS_RIGHT = PongMain.WIDTH - 38;
+	int yPos, height, score, dy;
+	final int XPOS_LEFT = 30, XPOS_RIGHT = PongMain.WIDTH - 40;
 	
 	public PaddleHuman()
 	{
-		setPos(30);
+		setPos((PongMain.HEIGHT - 30) / 2);
 		height = 70;
+		dy = 7;
 	}
 	
 	public PaddleHuman(int h)
 	{
-		setPos(30);
-		height = h;
+		setPos((PongMain.HEIGHT - 30) / 2);
+		setHeight(h);
+		dy = 7;
 	}
 	
 	public void setPos(int pos)
@@ -30,6 +29,26 @@ public class PaddleHuman
 		{
 			setPos(30);
 		}
+	}
+	
+	public void setHeight(int height)
+	{
+		this.height = height;
+		
+		if (this.height < 10)
+		{
+			this.height = 10;
+		}
+		
+		if (this.height > PongMain.HEIGHT - 38)
+		{
+			this.height = PongMain.HEIGHT - 38;
+		}
+	}
+	
+	public void setDy(int dy)
+	{
+		this.dy = dy;
 	}
 	
 	public int getPos()

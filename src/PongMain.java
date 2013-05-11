@@ -1,4 +1,5 @@
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -12,7 +13,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.util.BitSet;
-
 import javax.swing.Timer;
 
 public class PongMain extends Frame implements KeyListener, ActionListener
@@ -22,20 +22,21 @@ public class PongMain extends Frame implements KeyListener, ActionListener
 	Graphics graphics;
 	BufferedImage screen;
 	Timer time;
+	Font newFont = new Font("font1", Font.BOLD, 20);
 	
-	static final int WIDTH = 1300, 
-					HEIGHT = 600;
+	static int leftHeight, rightHeight, leftDy, rightDy;
 	
-	static final int LEFT_UP = 0, 
-					LEFT_DOWN = 1, 
-					RIGHT_UP = 2, 
-					RIGHT_DOWN = 3;
+	boolean leftWin, rightWin;
 	
-	BitSet bitset = new BitSet(4);
+	static final int WIDTH = 1300, HEIGHT = 600,
+					LEFT_UP = 0, LEFT_DOWN = 1, RIGHT_UP = 2, RIGHT_DOWN = 3;
+	
+	BitSet buttonsPressed = new BitSet(4);
 	
 	public PongMain()
 	{
 		setSize(WIDTH, HEIGHT);
+		setTitle("Pong Game");
 		addKeyListener(this);
 		setBackground(Color.white);
 		
@@ -44,6 +45,11 @@ public class PongMain extends Frame implements KeyListener, ActionListener
 		pRight = new PaddleHuman(70);
 		screen = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_ARGB);
 		graphics = screen.getGraphics();
+		
+		leftHeight = pLeft.height;
+		rightHeight = pRight.height;
+		leftDy = pLeft.dy;
+		rightDy = pRight.dy;
 		
 		//calls actionPerformed() at 67 (1000/15) FPS
 		time = new Timer(15, this);
@@ -66,12 +72,30 @@ public class PongMain extends Frame implements KeyListener, ActionListener
 		
 		//draw scores
 		graphics.setColor(Color.white);
+		graphics.setFont(newFont);
 		graphics.drawString(""+ pLeft.getScore(), (WIDTH / 2) - 50, 50);
 		graphics.drawString(""+ pRight.getScore(), (WIDTH / 2) + 50, 50);
 		
 		//draw ball
 		graphics.setColor(Color.red);
 		graphics.fillRect(ball.getX(), ball.getY(), 10, 10);
+		
+		//draw winner screen
+		graphics.setColor(Color.red);
+		if (pRight.getScore() >= 5 && !leftWin)
+		{
+			graphics.drawString("YOU WIN", (WIDTH / 2) + 200, 100);
+			graphics.drawString("YOU LOSE", (WIDTH / 2) - 250, 100);
+			graphics.drawString("Press R To Play Again", (WIDTH /2) - 80, 150);
+			rightWin = true;
+		}
+		else if (pLeft.getScore() >= 5 && !rightWin)
+		{
+			graphics.drawString("YOU LOSE", (WIDTH / 2) + 200, 100);
+			graphics.drawString("YOU WIN", (WIDTH / 2) - 250, 100);
+			graphics.drawString("Press R To Play Again", (WIDTH /2) - 80, 150);
+			leftWin = true;
+		}
 		
 		//draw image onto the frame
 		g.drawImage(screen,0,0,this);
@@ -94,6 +118,7 @@ public class PongMain extends Frame implements KeyListener, ActionListener
 		if ((ball.getX() <= pLeft.XPOS_LEFT+10) && hitPaddle())
 		{
 			ball.dx = (ball.dx * -1);
+			//pLeft.setHeight(pLeft.height - 10);
 			if (ball.dx > 0)
 			{
 				ball.dx += 1;
@@ -108,6 +133,7 @@ public class PongMain extends Frame implements KeyListener, ActionListener
 		if ((ball.getX() >= pRight.XPOS_RIGHT) && hitPaddle())
 		{
 			ball.dx = (ball.dx * -1);
+			//pRight.setHeight(pRight.height - 10);
 			if (ball.dx > 0)
 			{
 				ball.dx += 1;
@@ -123,13 +149,15 @@ public class PongMain extends Frame implements KeyListener, ActionListener
 		{
 			pRight.setScore(pRight.getScore() + 1);
 			ball.reset();
+			pLeft.setHeight(leftHeight);
 		}
 		
 		//ball goes past right paddle
-		if (ball.getX() >= PongMain.WIDTH - 8 && !hitPaddle())
+		if (ball.getX() >= PongMain.WIDTH - 18 && !hitPaddle())
 		{
 			pLeft.setScore(pLeft.getScore() + 1);
 			ball.reset();
+			pRight.setHeight(rightHeight);
 		}
 	}
 	
@@ -149,25 +177,36 @@ public class PongMain extends Frame implements KeyListener, ActionListener
 	
 	public void movePaddles()
 	{
-		if (bitset.get(LEFT_UP))
+		if (buttonsPressed.get(LEFT_UP))
 		{
-			pLeft.setPos(pLeft.getPos() - 7);
+			pLeft.setPos(pLeft.getPos() - pLeft.dy);
 		}
 		
-		if (bitset.get(LEFT_DOWN))
+		if (buttonsPressed.get(LEFT_DOWN))
 		{
-			pLeft.setPos(pLeft.getPos() + 7);
+			pLeft.setPos(pLeft.getPos() + pLeft.dy);
 		}
 		
-		if (bitset.get(RIGHT_UP))
+		if (buttonsPressed.get(RIGHT_UP))
 		{
-			pRight.setPos(pRight.getPos() - 7);
+			pRight.setPos(pRight.getPos() - pLeft.dy);
 		}
 		
-		if (bitset.get(RIGHT_DOWN))
+		if (buttonsPressed.get(RIGHT_DOWN))
 		{
-			pRight.setPos(pRight.getPos() + 7);
+			pRight.setPos(pRight.getPos() + pLeft.dy);
 		}
+	}
+	
+	public void gameReset()
+	{
+		ball.reset();
+		pLeft.height = leftHeight;
+		pRight.height = rightHeight;
+		pLeft.setScore(0);
+		pRight.setScore(0);
+		rightWin = false;
+		leftWin = false;
 	}
 
 	public void actionPerformed(ActionEvent e) 
@@ -185,6 +224,10 @@ public class PongMain extends Frame implements KeyListener, ActionListener
 		{
 			System.exit(0);
 		}
+		if (key == 'r')
+		{
+			gameReset();
+		}
 	}
 	
 	public void keyPressed(KeyEvent arg0) 
@@ -192,22 +235,22 @@ public class PongMain extends Frame implements KeyListener, ActionListener
 		char key = arg0.getKeyChar();
 		if (key == 'w')
 		{
-			bitset.set(LEFT_UP, true);
+			buttonsPressed.set(LEFT_UP, true);
 		}
 		
 		if (key == 's')
 		{
-			bitset.set(LEFT_DOWN, true);
+			buttonsPressed.set(LEFT_DOWN, true);
 		}
 		
 		if (key == '2')
 		{
-			bitset.set(RIGHT_DOWN, true);
+			buttonsPressed.set(RIGHT_DOWN, true);
 		}
 		
 		if (key == '8')
 		{
-			bitset.set(RIGHT_UP, true);
+			buttonsPressed.set(RIGHT_UP, true);
 		}
 	}
 
@@ -216,22 +259,22 @@ public class PongMain extends Frame implements KeyListener, ActionListener
 		char key = arg0.getKeyChar();
 		if (key == 'w')
 		{
-			bitset.set(LEFT_UP, false);
+			buttonsPressed.set(LEFT_UP, false);
 		}
 		
 		if (key == 's')
 		{
-			bitset.set(LEFT_DOWN, false);
+			buttonsPressed.set(LEFT_DOWN, false);
 		}
 		
 		if (key == '2')
 		{
-			bitset.set(RIGHT_DOWN, false);
+			buttonsPressed.set(RIGHT_DOWN, false);
 		}
 		
 		if (key == '8')
 		{
-			bitset.set(RIGHT_UP, false);
+			buttonsPressed.set(RIGHT_UP, false);
 		}
 	}
 	
@@ -240,5 +283,6 @@ public class PongMain extends Frame implements KeyListener, ActionListener
 		Frame frm = new PongMain();
 		frm.setVisible(true);
 		frm.repaint();
+		System.out.println(frm.getInsets());
 	}
 }

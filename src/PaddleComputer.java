@@ -1,10 +1,6 @@
-/*
- * PaddleRight has essentially the same set up as the human-controlled
- * paddle except that it uses the y position of the ball to determine 
- * the paddle location instead of using a mouseMovement listener
- */
-public class PaddleComputer{
-	
+
+public class PaddleComputer
+{
 	int yPos = 0, height, score;
 	final int XPOS = PongMain.WIDTH - 40;
 	
@@ -39,7 +35,7 @@ public class PaddleComputer{
 	{
 		return yPos;
 	}
-	//setters and getters for int score
+	
 	public void setScore(int s)
 	{
 		this.score = s;
