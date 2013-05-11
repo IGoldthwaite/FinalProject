@@ -2,168 +2,241 @@ import java.awt.Color;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
+import java.util.BitSet;
+
 import javax.swing.Timer;
 
-public class PongMain extends Frame implements MouseMotionListener, ActionListener
+public class PongMain extends Frame implements KeyListener, ActionListener
 {
 	Ball ball;
-	PaddleHuman pLeft;
-	PaddleComputer pRight;
+	PaddleHuman pLeft, pRight;
 	Graphics graphics;
 	BufferedImage screen;
 	Timer time;
 	
-	static final int WIDTH = 500;
-	static final int HEIGHT = 300;
-	long currentTime;
-	boolean running = false;
+	static final int WIDTH = 1300, 
+					HEIGHT = 600;
+	
+	static final int LEFT_UP = 0, 
+					LEFT_DOWN = 1, 
+					RIGHT_UP = 2, 
+					RIGHT_DOWN = 3;
+	
+	BitSet bitset = new BitSet(4);
 	
 	public PongMain()
 	{
-		System.out.println("Constructing frame starting...");
 		setSize(WIDTH, HEIGHT);
-		ball = new Ball();
-		pLeft = new PaddleHuman(30);
-		pRight = new PaddleComputer(70, ball.getY() - 35);
-		addMouseMotionListener(this);
+		addKeyListener(this);
 		setBackground(Color.white);
+		
+		ball = new Ball();
+		pLeft = new PaddleHuman(70);
+		pRight = new PaddleHuman(70);
 		screen = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_ARGB);
 		graphics = screen.getGraphics();
+		
+		//calls actionPerformed() at 67 (1000/15) FPS
 		time = new Timer(15, this);
 		time.start();
-		System.out.println("Constructing frame finished.");
 	}
 	
 	public void stop()
 	{
-		System.out.println("stop() called.");
 	}
 	
 	public void paint(Graphics g)
 	{
-		System.out.println("paint() running...");
-		System.out.println(pRight.score);
-		//first, we clear off whatever was previously on the image
+		//clear off previous image
 		graphics.clearRect(0,0,WIDTH,HEIGHT); 
 		
-		//we now draw our two paddles in blue
+		//draw paddles
 		graphics.setColor(Color.blue);
+		graphics.fillRect(pLeft.XPOS_LEFT, pLeft.getPos(), 10, pLeft.height);
+		graphics.fillRect(pLeft.XPOS_RIGHT, pRight.getPos(), 10, pRight.height);
 		
-		//the XPOS is a final int, so it never changes, but the 
-		//yPos does. We make the paddles 10 * 70.
-		//Left side
-		graphics.fillRect(pLeft.XPOS,pLeft.getPos(), 10, pLeft.height);
-		
-		//Right side
-		graphics.fillRect(pRight.XPOS, pRight.getPos(), 10, pRight.height);
-		
-		//this draws our mid-court line and our scores in white
+		//draw scores
 		graphics.setColor(Color.white);
+		graphics.drawString(""+ pLeft.getScore(), (WIDTH / 2) - 50, 50);
+		graphics.drawString(""+ pRight.getScore(), (WIDTH / 2) + 50, 50);
 		
-		//we show our player's hopeless circumstances
-		graphics.drawString("Futile", 150, 15);
-		
-		//we get the score from our PaddleRight object
-		graphics.drawString(""+ pRight.getScore(),300,15);
-		
-		//mid-court divider
-		//graphics.fillRect(240,0,20,300);
-		
-		/*if (pRight.score == 3)
-		{
-			graphics.drawString("YOU LOSE", 150, 150);
-			this.time.stop();
-		}*/
-		
-		//we draw the ball
+		//draw ball
 		graphics.setColor(Color.red);
+		graphics.fillRect(ball.getX(), ball.getY(), 10, 10);
 		
-		graphics.fillRect(ball.getX(),ball.getY(),10,10);
-		
-		//finally, we draw the offscreen image to the applet
+		//draw image onto the frame
 		g.drawImage(screen,0,0,this);
-		
-		//this line makes sure that all the monitors are up to date before 
-		//proceeding
-		Toolkit.getDefaultToolkit().sync();
-		System.out.println("paint() finished.");
 	}
 	
 	public void update(Graphics g)
 	{
-		System.out.println("update() running...");
 		paint(g);
-		System.out.println("update() finished.");
 	}
 	
 	public void checkCollision()
 	{
-		System.out.println("checkCollision() running...");
-		if (ball.getY() == 0 || ball.getY() == 290)
+		//ball hits top or bottom of screen
+		if (ball.getY() <= 30 || ball.getY() >= PongMain.HEIGHT - 18)
 		{
 			ball.dy = (ball.dy * -1);
 		}
 		
-		if ((ball.getX() <= 40) && hitPaddle())
+		//ball hits left paddle
+		if ((ball.getX() <= pLeft.XPOS_LEFT+10) && hitPaddle())
 		{
 			ball.dx = (ball.dx * -1);
+			if (ball.dx > 0)
+			{
+				ball.dx += 1;
+			}
+			else
+			{
+				ball.dx -= 1;
+			}
 		}
 		
-		if (ball.getX() >= 460)
+		//ball hits right paddle
+		if ((ball.getX() >= pRight.XPOS_RIGHT) && hitPaddle())
 		{
 			ball.dx = (ball.dx * -1);
+			if (ball.dx > 0)
+			{
+				ball.dx += 1;
+			}
+			else
+			{
+				ball.dx -= 1;
+			}
 		}
 		
-		if (ball.getX() == 0)
+		//ball goes past left paddle
+		if (ball.getX() <= 8 && !hitPaddle())
 		{
 			pRight.setScore(pRight.getScore() + 1);
 			ball.reset();
 		}
-		System.out.println("checkCollision() finished.");
+		
+		//ball goes past right paddle
+		if (ball.getX() >= PongMain.WIDTH - 8 && !hitPaddle())
+		{
+			pLeft.setScore(pLeft.getScore() + 1);
+			ball.reset();
+		}
 	}
 	
 	public boolean hitPaddle()
 	{
-		System.out.println("hitPaddle() running...");
 		boolean didHit = false;
 		if ((pLeft.getPos() - 10) <= ball.getY() && (pLeft.getPos() + pLeft.height) > ball.getY())
 		{
 			didHit = true;
 		}
-		System.out.println("hitPaddle() finished.");
+		if ((pRight.getPos() - 10) <= ball.getY() && (pRight.getPos() + pRight.height) > ball.getY())
+		{
+			didHit = true;
+		}
 		return didHit;
+	}
+	
+	public void movePaddles()
+	{
+		if (bitset.get(LEFT_UP))
+		{
+			pLeft.setPos(pLeft.getPos() - 7);
+		}
+		
+		if (bitset.get(LEFT_DOWN))
+		{
+			pLeft.setPos(pLeft.getPos() + 7);
+		}
+		
+		if (bitset.get(RIGHT_UP))
+		{
+			pRight.setPos(pRight.getPos() - 7);
+		}
+		
+		if (bitset.get(RIGHT_DOWN))
+		{
+			pRight.setPos(pRight.getPos() + 7);
+		}
 	}
 
 	public void actionPerformed(ActionEvent e) 
 	{
-		System.out.println("actionPerformed() running...");
 		ball.move();
-		pRight.setPos(ball.getY() - (pRight.height/2));
 		checkCollision();
+		movePaddles();
 		repaint();
-		System.out.println("actionPerformed() finished.");
 	}
-
-	public void mouseDragged(MouseEvent arg0) 
+	
+	public void keyTyped(KeyEvent arg0) 
 	{
+		char key = arg0.getKeyChar();
+		if (key == 27)
+		{
+			System.exit(0);
+		}
+	}
+	
+	public void keyPressed(KeyEvent arg0) 
+	{
+		char key = arg0.getKeyChar();
+		if (key == 'w')
+		{
+			bitset.set(LEFT_UP, true);
+		}
 		
+		if (key == 's')
+		{
+			bitset.set(LEFT_DOWN, true);
+		}
+		
+		if (key == '2')
+		{
+			bitset.set(RIGHT_DOWN, true);
+		}
+		
+		if (key == '8')
+		{
+			bitset.set(RIGHT_UP, true);
+		}
 	}
 
-	public void mouseMoved(MouseEvent arg0) 
+	public void keyReleased(KeyEvent arg0) 
 	{
-		pLeft.setPos(arg0.getY() - 35);
+		char key = arg0.getKeyChar();
+		if (key == 'w')
+		{
+			bitset.set(LEFT_UP, false);
+		}
+		
+		if (key == 's')
+		{
+			bitset.set(LEFT_DOWN, false);
+		}
+		
+		if (key == '2')
+		{
+			bitset.set(RIGHT_DOWN, false);
+		}
+		
+		if (key == '8')
+		{
+			bitset.set(RIGHT_UP, false);
+		}
 	}
 	
 	public static void main(String[] args)
 	{
-		System.out.println("main starting...");
 		Frame frm = new PongMain();
 		frm.setVisible(true);
 		frm.repaint();

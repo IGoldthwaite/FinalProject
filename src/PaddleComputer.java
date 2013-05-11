@@ -6,7 +6,7 @@
 public class PaddleComputer{
 	
 	int yPos = 0, height, score;
-	final int XPOS = 460;
+	final int XPOS = PongMain.WIDTH - 40;
 	
 	public PaddleComputer(int ballPos)
 	{
@@ -25,13 +25,13 @@ public class PaddleComputer{
 	public void setPos(int pos)
 	{
 		this.yPos = pos;
-		if(yPos > (PongMain.HEIGHT - this.height))
+		if(yPos > (PongMain.HEIGHT - this.height - 8))
 		{
-			setPos(PongMain.HEIGHT - this.height);
+			setPos(PongMain.HEIGHT - this.height - 8);
 		}
-		else if(yPos < 0)
+		else if(yPos < 30)
 		{
-			setPos(0);
+			setPos(30);
 		}
 	}
 	
