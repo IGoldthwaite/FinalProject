@@ -24,8 +24,8 @@ public class PongMain extends Frame implements KeyListener, ActionListener
 	Timer time;
 	Font newFont = new Font("font1", Font.BOLD, 20);
 	
-	boolean leftWin = false, rightWin = false, leftHit = false, rightHit = false, counting = false;
-	int counter = 0;
+	boolean leftWin = false, rightWin = false, leftHit = false, rightHit = false, counting = false, hasHitLeft = false, hasHitRight = false, leftMoving = false, rightMoving = false;
+	int counter = 0, hitCount = 0;
 	
 	static int leftSetHeight, rightSetHeight, ballSetDiameter, leftDy, rightDy;
 	
@@ -41,7 +41,7 @@ public class PongMain extends Frame implements KeyListener, ActionListener
 		addKeyListener(this);
 		setBackground(Color.white);
 		
-		ball = new Ball(100);
+		ball = new Ball(20);
 		pLeft = new PaddleHuman(70);
 		pRight = new PaddleHuman(70);
 		screen = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_ARGB);
@@ -64,8 +64,10 @@ public class PongMain extends Frame implements KeyListener, ActionListener
 	
 	public void paint(Graphics g)
 	{
+		System.out.println(hitCount);
+		
 		//clear off previous image
-		graphics.clearRect(0,0,WIDTH,HEIGHT); 
+		graphics.clearRect(0,0,WIDTH,HEIGHT);
 		
 		//draw paddles
 		if (leftHit)
@@ -73,14 +75,14 @@ public class PongMain extends Frame implements KeyListener, ActionListener
 			graphics.setColor(Color.red);
 			graphics.fillRect(pLeft.XPOS_LEFT, pLeft.getPos(), 10, pLeft.height);
 			graphics.setColor(Color.blue);
-			graphics.fillRect(pLeft.XPOS_RIGHT, pRight.getPos(), 10, pRight.height);
+			graphics.fillRect(pRight.XPOS_RIGHT, pRight.getPos(), 10, pRight.height);
 		}
 		else if (rightHit)
 		{
 			graphics.setColor(Color.blue);
 			graphics.fillRect(pLeft.XPOS_LEFT, pLeft.getPos(), 10, pLeft.height);
 			graphics.setColor(Color.red);
-			graphics.fillRect(pLeft.XPOS_RIGHT, pRight.getPos(), 10, pRight.height);
+			graphics.fillRect(pRight.XPOS_RIGHT, pRight.getPos(), 10, pRight.height);
 		}
 		else
 		{
@@ -95,7 +97,11 @@ public class PongMain extends Frame implements KeyListener, ActionListener
 		graphics.drawString(""+ pLeft.getScore(), (WIDTH / 2) - 50, 50);
 		graphics.drawString(""+ pRight.getScore(), (WIDTH / 2) + 50, 50);
 		
-		//draw ball
+		//draw ball and trail
+		graphics.setColor(Color.red.darker().darker().darker().darker());
+		graphics.fillOval(ball.getX() - ball.dx*2, ball.getY() - ball.dy*2, ball.diameter - 2, ball.diameter - 2);
+		graphics.setColor(Color.red.darker().darker());
+		graphics.fillOval(ball.getX() - ball.dx, ball.getY() - ball.dy, ball.diameter - 1, ball.diameter - 1);
 		graphics.setColor(Color.red);
 		graphics.fillOval(ball.getX(), ball.getY(), ball.diameter, ball.diameter);
 		
@@ -125,91 +131,107 @@ public class PongMain extends Frame implements KeyListener, ActionListener
 		paint(g);
 	}
 	
-//	public boolean delayed(int time)
-//	{
-//		counter++;
-//		if (counter < time)
-//		{
-//			return false;
-//		}
-//		counter = 0;
-//		return true;
-//	}
+	public void ballHit(String side, Ball ball)
+	{
+		if (side == "left")
+		{
+			if ((ball.getX() <= (pLeft.XPOS_LEFT+10)) && leftHitPaddle(ball) && !hasHitLeft)
+			{
+				hitCount++;
+//				leftHit = true;
+//				counting = true;
+//				hasHitLeft = true;
+				ball.dx = (ball.dx * -1);
+				if (ball.dx > 0)
+				{
+					ball.dx += 1;
+				}
+				else
+				{
+					ball.dx -= 1;
+				}
+			}
+		}
+		
+		else if (side == "right")
+		{
+			if (((ball.getX() + ball.diameter) >= pRight.XPOS_RIGHT) && rightHitPaddle(ball) && !hasHitRight)
+			{
+				hitCount++;
+//				rightHit = true;
+//				counting = true;
+//				hasHitRight = true;
+				ball.dx = (ball.dx * -1);
+				if (ball.dx > 0)
+				{
+					ball.dx += 1;
+				}
+				else
+				{
+					ball.dx -= 1;
+				}
+			}
+		}
+	}
+	
+	public void ballScore(String side, Ball ball)
+	{
+		if (side == "left")
+		{
+			if (ball.getX() <= 8 && !leftHitPaddle(ball))
+			{
+				hitCount = 0;
+				pRight.setScore(pRight.getScore() + 1);
+				ball.reset();
+				pLeft.setHeight(leftSetHeight);
+			}
+		}
+		
+		else if (side == "right")
+		{
+			if ((ball.getX() + ball.diameter) >= PongMain.WIDTH - 8 && !rightHitPaddle(ball))
+			{
+				hitCount = 0;
+				pLeft.setScore(pLeft.getScore() + 1);
+				ball.reset();
+				pRight.setHeight(rightSetHeight);
+			}
+		}
+	}
 	
 	public void checkCollision()
 	{
 		if (counting)
 		{
 			counter++;
-			ball.setDiameter(ball.diameter - 1);
+			pLeft.setHeight(pLeft.height - 1);
+//			ball.setDiameter(ball.diameter - 1);
 		}
 		
 		if (counter > 10)
 		{
+			hasHitLeft = false;
+			hasHitRight = false;
 			leftHit = false;
 			rightHit = false;
 			counting = false;
 			counter = 0;
 		}
 		
-		//ball hits top or bottom of screen
-		if (ball.getY() <= 30 || (ball.getY() + ball.diameter) >= PongMain.HEIGHT - 8)
-		{
-			ball.dy = (ball.dy * -1);
-		}
-		
 		//ball hits left paddle
-		if ((ball.getX() <= (pLeft.XPOS_LEFT+10)) && leftHitPaddle())
-		{
-			leftHit = true;
-			counting = true;
-			ball.dx = (ball.dx * -1);
-			//pLeft.setHeight(pLeft.height - 10);
-			if (ball.dx > 0)
-			{
-				ball.dx += 1;
-			}
-			else
-			{
-				ball.dx -= 1;
-			}
-		}
+		ballHit("left", ball);
 		
 		//ball hits right paddle
-		if (((ball.getX() + ball.diameter) >= pRight.XPOS_RIGHT) && rightHitPaddle())
-		{
-			rightHit = true;
-			counting = true;
-			ball.dx = (ball.dx * -1);
-			//pRight.setHeight(pRight.height - 10);
-			if (ball.dx > 0)
-			{
-				ball.dx += 1;
-			}
-			else
-			{
-				ball.dx -= 1;
-			}
-		}
+		ballHit("right", ball);
 		
 		//ball goes past left paddle
-		if (ball.getX() <= 8 && !leftHitPaddle())
-		{
-			pRight.setScore(pRight.getScore() + 1);
-			ball.reset();
-			pLeft.setHeight(leftSetHeight);
-		}
+		ballScore("left", ball);
 		
 		//ball goes past right paddle
-		if ((ball.getX() + ball.diameter) >= PongMain.WIDTH - 8 && !rightHitPaddle())
-		{
-			pLeft.setScore(pLeft.getScore() + 1);
-			ball.reset();
-			pRight.setHeight(rightSetHeight);
-		}
+		ballScore("right", ball);
 	}
 	
-	public boolean rightHitPaddle()
+	public boolean rightHitPaddle(Ball ball)
 	{
 		boolean didHit = false;
 		if ((pRight.getPos() - ball.diameter) <= ball.getY() && (pRight.getPos() + pRight.height) > ball.getY())
@@ -219,7 +241,7 @@ public class PongMain extends Frame implements KeyListener, ActionListener
 		return didHit;
 	}
 	
-	public boolean leftHitPaddle()
+	public boolean leftHitPaddle(Ball ball)
 	{
 		boolean didHit = false;
 		if ((pLeft.getPos() - ball.diameter) <= ball.getY() && (pLeft.getPos() + pLeft.height) > ball.getY())
@@ -241,20 +263,21 @@ public class PongMain extends Frame implements KeyListener, ActionListener
 			pLeft.setPos(pLeft.getPos() + pLeft.dy);
 		}
 		
-//		if (buttonsPressed.get(RIGHT_UP))
-//		{
-//			pRight.setPos(pRight.getPos() - pLeft.dy);
-//		}
-//		
-//		if (buttonsPressed.get(RIGHT_DOWN))
-//		{
-//			pRight.setPos(pRight.getPos() + pLeft.dy);
-//		}
+		if (buttonsPressed.get(RIGHT_UP))
+		{
+			pRight.setPos(pRight.getPos() - pRight.dy);
+		}
+		
+		if (buttonsPressed.get(RIGHT_DOWN))
+		{
+			pRight.setPos(pRight.getPos() + pRight.dy);
+		}
 	}
 	
 	public void gameReset()
 	{
 		ball.reset();
+		hitCount = 0;
 		pLeft.height = leftSetHeight;
 		pRight.height = rightSetHeight;
 		pLeft.setScore(0);
@@ -267,7 +290,8 @@ public class PongMain extends Frame implements KeyListener, ActionListener
 	{
 		ball.move();
 		checkCollision();
-		pRight.setPos((ball.getY() + (ball.diameter / 2) - (pRight.height / 2)));
+//		pRight.setPos((ball.getY() + (ball.diameter / 2) - (pRight.height / 2)));
+//		pLeft.setPos((ball.getY() + (ball.diameter / 2) - (pLeft.height / 2)));
 		movePaddles();
 		repaint();
 	}

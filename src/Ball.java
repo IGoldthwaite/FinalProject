@@ -1,8 +1,7 @@
 
 public class Ball
 {
-	private int xPos, yPos;
-	public int dx, dy, diameter;
+	public int xPos, yPos, dx, dy, diameter;
 	
 	public Ball()
 	{
@@ -52,6 +51,10 @@ public class Ball
 	public void move()
 	{
 		setPos(this.getX() + dx, this.getY() + dy);
+		if (this.getY() <= 30 || (this.getY() + this.diameter) >= PongMain.HEIGHT - 8)
+		{
+			this.dy = (this.dy * -1);
+		}
 	}	
 
 	public void reset()
