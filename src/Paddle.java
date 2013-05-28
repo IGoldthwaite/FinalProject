@@ -1,10 +1,10 @@
 
+
 public class Paddle 
 {
 	final int XPOS_LEFT = 30, XPOS_RIGHT = PongMain.WIDTH - 40;
-	int yPos, height, score, dy, hitCount = 0;
+	int yPos, height, score, dy, hitCount;
 	String position;
-	static boolean hasHitBall = false;
 	
 	public Paddle()
 	{
@@ -79,36 +79,34 @@ public class Paddle
 	{
 		if (position == "left")
 		{
-			if ((ball.getX() <= (this.XPOS_LEFT+10)) && canHitBall(ball) && !hasHitBall)
+			if ((ball.getX() <= (this.XPOS_LEFT+10)) && canHitBall(ball))
 			{
 				hitCount++;
-				hasHitBall = true;
 				ball.dx = (ball.dx * -1);
 				if (ball.dx > 0)
 				{
-					ball.dx = 5 + this.hitCount;
+					ball.dx += 1;
 				}
 				else
 				{
-					ball.dx = (-1 * this.hitCount) - 5;
+					ball.dx -= 1;
 				}
 			}
 		}
 		
 		else if (position == "right")
 		{
-			if (((ball.getX() + ball.diameter) >= this.XPOS_RIGHT) && canHitBall(ball) && !hasHitBall)
+			if (((ball.getX() + ball.diameter) >= this.XPOS_RIGHT) && canHitBall(ball))
 			{
 				hitCount++;
-				hasHitBall = true;
 				ball.dx = (ball.dx * -1);
 				if (ball.dx > 0)
 				{
-					ball.dx = 5 + this.hitCount;
+					ball.dx += 1;
 				}
 				else
 				{
-					ball.dx = (-1 * this.hitCount) - 5;
+					ball.dx -= 1;
 				}
 			}
 		}
@@ -152,7 +150,6 @@ public class Paddle
 	public void reset()
 	{
 		setScore(0);
-		setPos((PongMain.HEIGHT - 30) / 2);
 		
 		if (PongMain.SINGLE_PLAYER)
 		{

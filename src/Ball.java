@@ -65,3 +65,4 @@ public class Ball
 		diameter = PongMain.ballSetDiameter;
 	}
 }
+
