@@ -1,16 +1,19 @@
 
-
 public class Paddle 
 {
 	final int XPOS_LEFT = 30, XPOS_RIGHT = PongMain.WIDTH - 40;
-	int yPos, height, score, dy, hitCount;
+	int yPos, height, score, dy, hitCount, topSection, midSection, botSection;
 	String position;
+	boolean up, down;
 	
 	public Paddle()
 	{
 		setPos((PongMain.HEIGHT - 30) / 2);
 		height = 70;
 		dy = 7;
+		topSection = yPos + (height / 3);
+		midSection = yPos + (height * (2/3));
+		botSection = yPos + (height);
 	}
 	
 	public void setPos(int pos)
@@ -24,6 +27,9 @@ public class Paddle
 		{
 			setPos(30);
 		}
+		topSection = yPos + (height / 3);
+		midSection = yPos + (height / 3)*2;
+		botSection = yPos + (height);
 	}
 	
 	public void setHeight(int height)
@@ -65,16 +71,48 @@ public class Paddle
 		return score;
 	}
 	
-	public boolean canHitBall(Ball ball)
+	//returns 0 if the ball hits the top third of the paddle, a 1 if it hits the middle, and a 2 if it hits the bottom third.
+	public int hitLocation(Ball ball)
 	{
-		boolean didHit = false;
-		if ((this.getPos() - ball.diameter) <= ball.getY() && (this.getPos() + this.height) > ball.getY())
+		//bottom of paddle
+		if (ball.getY() < this.botSection && (ball.getY() + (ball.diameter / 2)) > this.midSection)
 		{
-			didHit = true;
+			System.out.println(2);
+			return 2;
 		}
-		return didHit;
+		//middle of paddle
+		else if (((ball.getY() + (ball.diameter / 2)) < this.midSection) && (ball.getY() + (ball.diameter / 2)) > this.topSection)
+		{
+			System.out.println(1);
+			return 1;
+		}
+		//top of paddle
+		else if (((ball.getY() + (ball.diameter / 2)) < this.topSection) && (ball.getY() + ball.diameter) > this.yPos)
+		{
+			System.out.println(0);
+			return 0;
+		}
+		else
+		{
+			System.out.println(-1);
+			return -1;
+		}
 	}
 	
+	//Will return true if the ball is in the paddle's borders, false otherwise.
+	public boolean canHitBall(Ball ball)
+	{
+		if ((this.getPos() - ball.diameter) <= ball.getY() && (this.getPos() + this.height) > ball.getY())
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	//checks to see if the ball has passed by or hit the paddle. Changes the ball's movement appropriately.
 	public void checkHits(Ball ball)
 	{
 		if (position == "left")
@@ -83,6 +121,14 @@ public class Paddle
 			{
 				hitCount++;
 				ball.dx = (ball.dx * -1);
+				if (this.up)
+				{
+					ball.dy = -(Math.abs(ball.dy)+3);
+				}
+				else if (this.down)
+				{
+					ball.dy = Math.abs(ball.dy)+3;
+				}
 				if (ball.dx > 0)
 				{
 					ball.dx += 1;
@@ -137,12 +183,25 @@ public class Paddle
 		
 		else if (position == "right")
 		{
-			if ((ball.getX() + ball.diameter) >= PongMain.WIDTH - 8 && !canHitBall(ball))
+			if (PongMain.SINGLE_PLAYER)
 			{
-				hitCount = 0;
-				PongMain.pLeft.setScore(PongMain.pLeft.getScore() + 1);
-				ball.reset();
-				setHeight(PongMain.rightSetHeight);
+				if ((ball.getX() + ball.diameter) >= PongMain.WIDTH - 8 && !canHitBall(ball))
+				{
+					hitCount = 0;
+					PongMain.pLeft.setScore(PongMain.pLeft.getScore() + 1);
+					ball.reset();
+					setHeight(PongMain.AISetHeight);
+				}
+			}
+			else
+			{
+				if ((ball.getX() + ball.diameter) >= PongMain.WIDTH - 8 && !canHitBall(ball))
+				{
+					hitCount = 0;
+					PongMain.pLeft.setScore(PongMain.pLeft.getScore() + 1);
+					ball.reset();
+					setHeight(PongMain.rightSetHeight);
+				}
 			}
 		}
 	}
@@ -150,6 +209,7 @@ public class Paddle
 	public void reset()
 	{
 		setScore(0);
+		hitCount = 0;
 		
 		if (PongMain.SINGLE_PLAYER)
 		{
@@ -159,6 +219,7 @@ public class Paddle
 			}
 			else if (position == "right")
 			{
+				System.out.println(PongMain.AISetHeight);
 				this.height = PongMain.AISetHeight;
 			}
 		}

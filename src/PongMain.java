@@ -42,23 +42,21 @@ public class PongMain extends Frame implements KeyListener, ActionListener
 		ball = new Ball(20);
 		pLeft = new HumanPaddle("left", 'w', 's');
 		pRight = new HumanPaddle("right", '8', '2');
-		pAI = new AI("right", "impossible");
+		pAI = new AI("right", "medium");
 		screen = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_ARGB);
 		graphics = screen.getGraphics();
 		
+		ballSetDiameter = ball.diameter;
+		leftSetHeight = pLeft.height;
+		leftSetDy = pLeft.dy;
+		
 		if (SINGLE_PLAYER)
 		{
-			ballSetDiameter = ball.diameter;
-			leftSetHeight = pLeft.height;
-			leftSetDy = pLeft.dy;
 			AISetHeight = pAI.height;
 			AISetDy = pAI.dy;
 		}
 		else
 		{
-			ballSetDiameter = ball.diameter;
-			leftSetHeight = pLeft.height;
-			leftSetDy = pLeft.dy;
 			rightSetHeight = pRight.height;
 			rightSetDy = pRight.dy;
 		}
@@ -86,7 +84,7 @@ public class PongMain extends Frame implements KeyListener, ActionListener
 			graphics.fillRect(pAI.XPOS_RIGHT, pAI.getPos(), 10, pAI.height);
 			graphics.setColor(Color.white);
 			graphics.setFont(newFont);
-			graphics.drawString("Try Harder", (WIDTH / 2) - 100, 50);
+			graphics.drawString(""+ pLeft.getScore(), (WIDTH / 2) - 100, 50);
 			graphics.drawString(""+ pAI.getScore(), (WIDTH / 2) + 50, 50);
 			graphics.setColor(Color.red.darker().darker().darker().darker());
 			graphics.fillOval(ball.getX() - ball.dx*2, ball.getY() - ball.dy*2, ball.diameter - 2, ball.diameter - 2);

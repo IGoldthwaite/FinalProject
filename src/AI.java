@@ -1,5 +1,4 @@
 
-
 public class AI extends Paddle
 {
 	String difficulty;
@@ -14,7 +13,34 @@ public class AI extends Paddle
 	{
 		if (difficulty == "impossible")
 		{
-			setPos(PongMain.ball.getY() - (this.height / 2));
+			setPos((PongMain.ball.getY() + PongMain.ball.diameter) - (this.height / 2));
+		}
+		if (difficulty == "hard")
+		{
+			this.setDy(5);
+			if ((this.getPos() + (this.height / 2)) > (PongMain.ball.getY() + PongMain.ball.diameter))
+			{
+				this.setPos(this.getPos() - dy);
+			}
+			else
+			{
+				this.setPos(this.getPos() + dy);
+			}
+		}
+		if (difficulty == "medium")
+		{
+			this.setDy(5);
+			if (PongMain.ball.xPos > PongMain.WIDTH / 2 && !this.canHitBall(PongMain.ball))
+			{
+				if ((this.getPos() + (this.height / 2)) > (PongMain.ball.getY() + PongMain.ball.diameter))
+				{
+					this.setPos(this.getPos() - dy);
+				}
+				else
+				{
+					this.setPos(this.getPos() + dy);
+				}
+			}
 		}
 	}
 }
