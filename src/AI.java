@@ -49,15 +49,15 @@ public class AI extends Paddle
 		
 		if (difficulty == "playMaker")
 		{
-			this.setDy(3);
+			this.setDy(2);
 			if (PongMain.ball.xPos > PongMain.WIDTH / 1.1)
 			{
 				color = Color.red;
-				this.setDy(Math.abs(PongMain.ball.dy * 2));
+				this.setDy(Math.abs(PongMain.ball.dy * 3));
 			}
 			else
 			{
-				color = Color.darkGray.darker().darker().darker().darker().darker();
+				color = Color.darkGray.darker().darker();
 			}
 			if (PongMain.ball.getY() + (PongMain.ball.diameter / 2) > this.getPos() + (height / 3) && 
 					PongMain.ball.getY() + (PongMain.ball.diameter / 2) < this.getPos() + (height /3)*2)

@@ -33,11 +33,11 @@ public class PongMain extends Frame implements KeyListener, ActionListener
 	
 	static int leftSetHeight, rightSetHeight, AISetHeight, ballSetDiameter, leftSetDy, rightSetDy, AISetDy;
 	
-	static Color backgroundColor = Color.black;
+	static Color backgroundColor = Color.black, ballColor = Color.red;
 	
 	int hitCount = 0;
 	
-	boolean leftWin, rightWin, grow, ballGrow, party;
+	boolean leftWin, rightWin, grow, ballWave, party;
 	
 	public PongMain()
 	{
@@ -103,11 +103,11 @@ public class PongMain extends Frame implements KeyListener, ActionListener
 			graphics.drawString(""+ pLeft.getScore(), (WIDTH / 2) - 100, 50);
 			graphics.drawString(""+ pAI.getScore(), (WIDTH / 2) + 50, 50);
 			//draws the ball and ball trail
-			graphics.setColor(Color.red.darker().darker().darker().darker());
+			graphics.setColor(ballColor.darker().darker().darker().darker());
 			graphics.fillOval(ball.getX() - ball.dx*2, ball.getY() - ball.dy*2, ball.diameter - 2, ball.diameter - 2);
-			graphics.setColor(Color.red.darker().darker());
+			graphics.setColor(ballColor.darker().darker());
 			graphics.fillOval(ball.getX() - ball.dx, ball.getY() - ball.dy, ball.diameter - 1, ball.diameter - 1);
-			graphics.setColor(Color.red);
+			graphics.setColor(ballColor);
 			graphics.fillOval(ball.getX(), ball.getY(), ball.diameter, ball.diameter);
 			graphics.setColor(Color.red);
 			//if the AI wins
@@ -168,19 +168,21 @@ public class PongMain extends Frame implements KeyListener, ActionListener
 		//when one side wins
 		if (party)
 		{
-			//WARNING: super party mode
-			if (backgroundColor != Color.white)
-			{
-				backgroundColor = Color.white;
-				pLeft.color = Color.black;
-				pAI.color = Color.black;
-			}
-			else
-			{
-				backgroundColor = Color.black;
-				pLeft.color = Color.white;
-				pAI.color = Color.white;
-			}
+			//WARNING: super party mode currently in beta
+//			if (backgroundColor != Color.white)
+//			{
+//				backgroundColor = Color.white;
+//				pLeft.color = Color.black;
+//				pAI.color = Color.black;
+//				ballColor = Color.black;
+//			}
+//			else
+//			{
+//				backgroundColor = Color.black;
+//				pLeft.color = Color.white;
+//				pAI.color = Color.white;
+//				ballColor = Color.white;
+//			}
 			
 			if (ball.diameter > 50)
 			{
@@ -192,11 +194,11 @@ public class PongMain extends Frame implements KeyListener, ActionListener
 			}
 			if (ball.dy > Math.random()*30)
 			{
-				ballGrow = false;
+				ballWave = false;
 			}
 			else if (ball.dy < -(Math.random()*30))
 			{
-				ballGrow = true;
+				ballWave = true;
 			}
 			if (grow)
 			{
@@ -212,7 +214,7 @@ public class PongMain extends Frame implements KeyListener, ActionListener
 				pRight.height -= 1;
 				ball.diameter -= 1;
 			}
-			if (ballGrow)
+			if (ballWave)
 			{
 				ball.dy += 1;
 			}
