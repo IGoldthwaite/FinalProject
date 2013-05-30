@@ -1,20 +1,20 @@
+import java.awt.Color;
+
 
 public class Paddle 
 {
 	final int XPOS_LEFT = 30, XPOS_RIGHT = PongMain.WIDTH - 40;
-	int yPos, height, score, dy, hitCount, topSection, midSection, botSection;
+	int yPos, height, score, dy;
 	String position;
 	boolean up, down;
 	double perpAngle, angle, magnitude;
+	Color color;
 	
 	public Paddle()
 	{
 		setPos((PongMain.HEIGHT - 30) / 2);
 		height = 70;
 		dy = 7;
-		topSection = yPos + (height / 3);
-		midSection = yPos + (height / 3)*2;
-		botSection = yPos + (height);
 	}
 	
 	public void setPos(int pos)
@@ -28,9 +28,6 @@ public class Paddle
 		{
 			setPos(30);
 		}
-		topSection = yPos + (height / 3);
-		midSection = yPos + (height / 3)*2;
-		botSection = yPos + (height);
 	}
 	
 	public void setHeight(int height)
@@ -72,34 +69,6 @@ public class Paddle
 		return score;
 	}
 	
-	//returns 0 if the ball hits the top third of the paddle, a 1 if it hits the middle, and a 2 if it hits the bottom third.
-	public int hitLocation(Ball ball)
-	{
-		//bottom of paddle
-		if (ball.getY() < this.botSection && (ball.getY() + (ball.diameter / 2)) > this.midSection)
-		{
-			System.out.println(2);
-			return 2;
-		}
-		//middle of paddle
-		else if (((ball.getY() + (ball.diameter / 2)) < this.midSection) && (ball.getY() + (ball.diameter / 2)) > this.topSection)
-		{
-			System.out.println(1);
-			return 1;
-		}
-		//top of paddle
-		else if (((ball.getY() + (ball.diameter / 2)) < this.topSection) && (ball.getY() + ball.diameter) > this.yPos)
-		{
-			System.out.println(0);
-			return 0;
-		}
-		else
-		{
-			System.out.println(-1);
-			return -1;
-		}
-	}
-	
 	//Will return true if the ball is in the paddle's borders, false otherwise.
 	public boolean canHitBall(Ball ball)
 	{
@@ -118,87 +87,87 @@ public class Paddle
 	{
 		if (position == "left")
 		{
-			if ((ball.getX() <= (this.XPOS_LEFT+10)) && canHitBall(ball))
+			//if the ball hits the left paddle
+			if ((ball.getX() <= (this.XPOS_LEFT + 10)) && canHitBall(ball))
 			{
-				hitCount++;
 				ball.dx = (ball.dx * -1);
 				if (this.up)
 				{
-					ball.dy = -(Math.abs(ball.dy)+2);
+					ball.dy -= 3;
+					if (ball.dx > 0)
+					{
+						ball.dx += 1;
+					}
+					else
+					{
+						ball.dx -= 1;
+					}
 				}
 				else if (this.down)
 				{
-					ball.dy = Math.abs(ball.dy)+2;
-				}
-				if (ball.dx > 0)
-				{
-					ball.dx += 1;
-				}
-				else
-				{
-					ball.dx -= 1;
-				}
-			}
-		}
-		
-		else if (position == "right")
-		{
-			if (((ball.getX() + ball.diameter) >= this.XPOS_RIGHT) && canHitBall(ball))
-			{
-				hitCount++;
-				ball.dx = (ball.dx * -1);
-				if (ball.dx > 0)
-				{
-					ball.dx += 1;
-				}
-				else
-				{
-					ball.dx -= 1;
+					ball.dy += 3;
+					if (ball.dx > 0)
+					{
+						ball.dx += 1;
+					}
+					else
+					{
+						ball.dx -= 1;
+					}
 				}
 			}
-		}
-	}
-	
-	public void updateScore(Ball ball)
-	{
-		if (position == "left")
-		{
-			if (ball.getX() >= PongMain.WIDTH - 8 && !canHitBall(ball))
+			//if the ball passes by the left paddle
+			else if (ball.getX() <= (this.XPOS_LEFT + 10) && !canHitBall(ball))
 			{
 				PongMain.RIGHT_SERVE = true;
+				ball.reset();
 				if (PongMain.SINGLE_PLAYER)
 				{
-					PongMain.pAI.hitCount = 0;
-					PongMain.pAI.setHeight(PongMain.AISetHeight);
+					PongMain.pAI.setScore(PongMain.pAI.getScore() + 1);
 				}
 				else
 				{
-					hitCount = 0;
-					PongMain.pRight.setHeight(PongMain.rightSetHeight);
+					PongMain.pRight.setScore(PongMain.pRight.getScore() + 1);
 				}
-				ball.reset();
-				this.setScore(this.getScore() + 1);
 			}
 		}
-		
 		else if (position == "right")
 		{
-			if (ball.getX() <= 8 && !canHitBall(ball))
+			//if the ball hits the right paddle
+			if ((ball.getX() + ball.diameter) >= this.XPOS_RIGHT && canHitBall(ball))
+			{
+				ball.dx = (ball.dx * -1);
+				if (this.up)
+				{
+					ball.dy -= 2;
+				}
+				else if (this.down)
+				{
+					ball.dy += 2;
+				}
+				if (ball.dx > 0)
+				{
+					ball.dx += 1;
+				}
+				else
+				{
+					ball.dx -= 1;
+				}
+			}
+			//if the ball passes by the left paddle
+			else if ((ball.getX() + ball.diameter) >= this.XPOS_RIGHT && !canHitBall(ball))
 			{
 				PongMain.RIGHT_SERVE = false;
-				hitCount = 0;
-				PongMain.pLeft.setHeight(PongMain.leftSetHeight);
 				ball.reset();
-				this.setScore(this.getScore() + 1);
+				PongMain.pLeft.setScore(PongMain.pLeft.getScore() + 1);
 			}
 		}
 	}
 	
+	//resets this paddle's score and height
 	public void reset()
 	{
 		setScore(0);
-		hitCount = 0;
-		
 		if (PongMain.SINGLE_PLAYER)
 		{
 			if (position == "left")

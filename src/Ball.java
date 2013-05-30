@@ -68,7 +68,7 @@ public class Ball
 		{
 			dx = 5;
 		}
-		dy = -5;
+		dy = (int) (Math.random()*10 -4);
 		diameter = PongMain.ballSetDiameter;
 	}
 }

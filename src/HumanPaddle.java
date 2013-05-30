@@ -1,3 +1,5 @@
+import java.awt.Color;
+
 
 public class HumanPaddle extends Paddle
 {
@@ -5,6 +7,7 @@ public class HumanPaddle extends Paddle
 	
 	public HumanPaddle(String pos, char up, char down)
 	{
+		color = Color.blue;
 		position = pos;
 		upButton = up;
 		downButton = down;
