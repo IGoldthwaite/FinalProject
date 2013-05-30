@@ -60,7 +60,14 @@ public class Ball
 	public void reset()
 	{
 		setPos((PongMain.WIDTH / 2) - (diameter / 2), (PongMain.HEIGHT / 2) - (diameter / 2));
-		dx = 5;
+		if (PongMain.RIGHT_SERVE)
+		{
+			dx = -5;
+		}
+		else
+		{
+			dx = 5;
+		}
 		dy = -5;
 		diameter = PongMain.ballSetDiameter;
 	}

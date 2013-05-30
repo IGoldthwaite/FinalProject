@@ -5,6 +5,7 @@ public class Paddle
 	int yPos, height, score, dy, hitCount, topSection, midSection, botSection;
 	String position;
 	boolean up, down;
+	double perpAngle, angle, magnitude;
 	
 	public Paddle()
 	{
@@ -12,7 +13,7 @@ public class Paddle
 		height = 70;
 		dy = 7;
 		topSection = yPos + (height / 3);
-		midSection = yPos + (height * (2/3));
+		midSection = yPos + (height / 3)*2;
 		botSection = yPos + (height);
 	}
 	
@@ -123,11 +124,11 @@ public class Paddle
 				ball.dx = (ball.dx * -1);
 				if (this.up)
 				{
-					ball.dy = -(Math.abs(ball.dy)+3);
+					ball.dy = -(Math.abs(ball.dy)+2);
 				}
 				else if (this.down)
 				{
-					ball.dy = Math.abs(ball.dy)+3;
+					ball.dy = Math.abs(ball.dy)+2;
 				}
 				if (ball.dx > 0)
 				{
@@ -162,46 +163,33 @@ public class Paddle
 	{
 		if (position == "left")
 		{
-			if (ball.getX() <= 8 && !canHitBall(ball))
+			if (ball.getX() >= PongMain.WIDTH - 8 && !canHitBall(ball))
 			{
+				PongMain.RIGHT_SERVE = true;
 				if (PongMain.SINGLE_PLAYER)
 				{
-					hitCount = 0;
-					PongMain.pAI.setScore(PongMain.pAI.getScore() + 1);
-					ball.reset();
-					setHeight(PongMain.leftSetHeight);
+					PongMain.pAI.hitCount = 0;
+					PongMain.pAI.setHeight(PongMain.AISetHeight);
 				}
 				else
 				{
 					hitCount = 0;
-					PongMain.pRight.setScore(PongMain.pRight.getScore() + 1);
-					ball.reset();
-					setHeight(PongMain.leftSetHeight);
+					PongMain.pRight.setHeight(PongMain.rightSetHeight);
 				}
+				ball.reset();
+				this.setScore(this.getScore() + 1);
 			}
 		}
 		
 		else if (position == "right")
 		{
-			if (PongMain.SINGLE_PLAYER)
+			if (ball.getX() <= 8 && !canHitBall(ball))
 			{
-				if ((ball.getX() + ball.diameter) >= PongMain.WIDTH - 8 && !canHitBall(ball))
-				{
-					hitCount = 0;
-					PongMain.pLeft.setScore(PongMain.pLeft.getScore() + 1);
-					ball.reset();
-					setHeight(PongMain.AISetHeight);
-				}
-			}
-			else
-			{
-				if ((ball.getX() + ball.diameter) >= PongMain.WIDTH - 8 && !canHitBall(ball))
-				{
-					hitCount = 0;
-					PongMain.pLeft.setScore(PongMain.pLeft.getScore() + 1);
-					ball.reset();
-					setHeight(PongMain.rightSetHeight);
-				}
+				PongMain.RIGHT_SERVE = false;
+				hitCount = 0;
+				PongMain.pLeft.setHeight(PongMain.leftSetHeight);
+				ball.reset();
+				this.setScore(this.getScore() + 1);
 			}
 		}
 	}
@@ -219,7 +207,6 @@ public class Paddle
 			}
 			else if (position == "right")
 			{
-				System.out.println(PongMain.AISetHeight);
 				this.height = PongMain.AISetHeight;
 			}
 		}

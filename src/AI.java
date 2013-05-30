@@ -15,6 +15,7 @@ public class AI extends Paddle
 		{
 			setPos((PongMain.ball.getY() + PongMain.ball.diameter) - (this.height / 2));
 		}
+		
 		if (difficulty == "hard")
 		{
 			this.setDy(5);
@@ -27,19 +28,21 @@ public class AI extends Paddle
 				this.setPos(this.getPos() + dy);
 			}
 		}
-		if (difficulty == "medium")
+		
+		if (difficulty == "playMaker")
 		{
-			this.setDy(5);
-			if (PongMain.ball.xPos > PongMain.WIDTH / 2 && !this.canHitBall(PongMain.ball))
+			this.setDy(2);
+			if (PongMain.ball.xPos > PongMain.WIDTH / 1.1)
 			{
-				if ((this.getPos() + (this.height / 2)) > (PongMain.ball.getY() + PongMain.ball.diameter))
-				{
-					this.setPos(this.getPos() - dy);
-				}
-				else
-				{
-					this.setPos(this.getPos() + dy);
-				}
+				this.setDy(10);
+			}
+			if ((this.getPos() + (this.height / 2)) > (PongMain.ball.getY() + PongMain.ball.diameter))
+			{
+				this.setPos(this.getPos() - dy);
+			}
+			else
+			{
+				this.setPos(this.getPos() + dy);
 			}
 		}
 	}

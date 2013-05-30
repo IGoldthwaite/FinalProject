@@ -14,7 +14,7 @@ import javax.swing.Timer;
 
 public class PongMain extends Frame implements KeyListener, ActionListener
 {
-	static boolean SINGLE_PLAYER = true;
+	static boolean SINGLE_PLAYER = true, RIGHT_SERVE = false;
 	
 	static Ball ball;
 	static HumanPaddle pLeft, pRight;
@@ -42,7 +42,7 @@ public class PongMain extends Frame implements KeyListener, ActionListener
 		ball = new Ball(20);
 		pLeft = new HumanPaddle("left", 'w', 's');
 		pRight = new HumanPaddle("right", '8', '2');
-		pAI = new AI("right", "medium");
+		pAI = new AI("right", "hard");
 		screen = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_ARGB);
 		graphics = screen.getGraphics();
 		
