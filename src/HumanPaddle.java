@@ -1,6 +1,10 @@
 import java.awt.Color;
 
-
+/**
+ * The human controlled paddle that extends Paddle.
+ * @author Isaac Goldthwaite, Kevin Edwards
+ *
+ */
 public class HumanPaddle extends Paddle
 {
 	char upButton, downButton;
@@ -13,6 +17,9 @@ public class HumanPaddle extends Paddle
 		downButton = down;
 	}
 	
+	/**
+	 * called continuously in PongMain and will move the paddle if the human player presses the up/down keys.
+	 */
 	public void act()
 	{
 		if (up)

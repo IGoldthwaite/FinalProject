@@ -1,28 +1,37 @@
 import java.awt.Color;
 
-
+/**
+ * The computer controlled paddle. Has (currently) three difficulties: impossible, hard, and playMaker.
+ * @author Isaac Goldthwaite, Kevin Edwards
+ *
+ */
 public class AI extends Paddle
 {
 	String difficulty;
 	
 	public AI(String pos, String diff)
 	{
-		color = Color.darkGray.darker().darker().darker().darker().darker();
+		color = Color.black;
 		difficulty = diff;
 		position = pos;
 	}
 	
+	/**
+	 * called continuously in PongMain and will move the paddle based on the ball's location and the difficulty of the AI.
+	 */
 	public void act()
 	{
 		
 		if (difficulty == "impossible")
 		{
-			setPos((PongMain.ball.getY() + PongMain.ball.diameter) - (this.height / 2));
+			color = Color.red.darker();
+			setPos((PongMain.ball.getY() + (PongMain.ball.diameter / 2)) - (this.height / 2));
 		}
 		
-		if (difficulty == "easy")
+		if (difficulty == "hard")
 		{
-			this.setDy(5);
+			color = Color.cyan.darker().darker();
+			this.setDy(10);
 			if (PongMain.ball.getY() + (PongMain.ball.diameter / 2) > this.getPos() + (height / 3) && 
 					PongMain.ball.getY() + (PongMain.ball.diameter / 2) < this.getPos() + ((height / 3)*2))
 			{
@@ -50,8 +59,8 @@ public class AI extends Paddle
 			{
 				color = Color.darkGray.darker().darker().darker().darker().darker();
 			}
-			if (PongMain.ball.getY() + (PongMain.ball.diameter / 2) > this.getPos() + (height / 2.5) && 
-					PongMain.ball.getY() + (PongMain.ball.diameter / 2) < this.getPos() + ((height / 2.5)*2))
+			if (PongMain.ball.getY() + (PongMain.ball.diameter / 2) > this.getPos() + (height / 3) && 
+					PongMain.ball.getY() + (PongMain.ball.diameter / 2) < this.getPos() + (height /3)*2)
 			{
 				//makes the AI paddle less shaky
 			}

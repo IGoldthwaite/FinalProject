@@ -12,9 +12,14 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import javax.swing.Timer;
 
+/**
+ * The main class that runs, draws, and controls the game
+ * @author Isaac Goldthwaite, Kevin Edwards
+ * 
+ */
 public class PongMain extends Frame implements KeyListener, ActionListener
 {
-	static boolean SINGLE_PLAYER = false, RIGHT_SERVE = false;	
+	static boolean SINGLE_PLAYER = true, RIGHT_SERVE = false;	
 	static Ball ball;
 	static HumanPaddle pLeft, pRight;
 	static AI pAI;
@@ -27,6 +32,8 @@ public class PongMain extends Frame implements KeyListener, ActionListener
 	static final int WIDTH = 1300, HEIGHT = 600;
 	
 	static int leftSetHeight, rightSetHeight, AISetHeight, ballSetDiameter, leftSetDy, rightSetDy, AISetDy;
+	
+	static Color backgroundColor = Color.black;
 	
 	int hitCount = 0;
 	
@@ -80,6 +87,8 @@ public class PongMain extends Frame implements KeyListener, ActionListener
 	public void paint(Graphics g)
 	{
 		graphics.clearRect(0,0,WIDTH,HEIGHT);
+		graphics.setColor(backgroundColor);
+		graphics.fillRect(0, 0, WIDTH, HEIGHT);
 		
 		if (SINGLE_PLAYER)
 		{
@@ -102,7 +111,7 @@ public class PongMain extends Frame implements KeyListener, ActionListener
 			graphics.fillOval(ball.getX(), ball.getY(), ball.diameter, ball.diameter);
 			graphics.setColor(Color.red);
 			//if the AI wins
-			if (pAI.getScore() >= 5 && !leftWin)
+			if (pAI.getScore() >= 1 && !leftWin)
 			{
 				rightWin = true;
 				graphics.drawString("YOU LOSE", (WIDTH / 2) - 70, 100);
@@ -110,7 +119,7 @@ public class PongMain extends Frame implements KeyListener, ActionListener
 				party = true;
 			}
 			//if the human player wins
-			else if (pLeft.getScore() >= 5 && !rightWin)
+			else if (pLeft.getScore() >= 10 && !rightWin)
 			{
 				leftWin = true;
 				graphics.drawString("YOU WIN", (WIDTH / 2) - 65, 100);
@@ -159,6 +168,20 @@ public class PongMain extends Frame implements KeyListener, ActionListener
 		//when one side wins
 		if (party)
 		{
+			//WARNING: super party mode
+			if (backgroundColor != Color.white)
+			{
+				backgroundColor = Color.white;
+				pLeft.color = Color.black;
+				pAI.color = Color.black;
+			}
+			else
+			{
+				backgroundColor = Color.black;
+				pLeft.color = Color.white;
+				pAI.color = Color.white;
+			}
+			
 			if (ball.diameter > 50)
 			{
 				grow = false;
@@ -167,11 +190,11 @@ public class PongMain extends Frame implements KeyListener, ActionListener
 			{
 				grow = true;
 			}
-			if (ball.dy > 15)
+			if (ball.dy > Math.random()*30)
 			{
 				ballGrow = false;
 			}
-			else if (ball.dy < -15)
+			else if (ball.dy < -(Math.random()*30))
 			{
 				ballGrow = true;
 			}

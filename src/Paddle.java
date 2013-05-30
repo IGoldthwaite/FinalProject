@@ -1,6 +1,10 @@
 import java.awt.Color;
 
-
+/**
+ * The Base Paddle used both by HumanPaddle and the AI
+ * @author Isaac Goldthwaite, Kevin Edwards
+ *
+ */
 public class Paddle 
 {
 	final int XPOS_LEFT = 30, XPOS_RIGHT = PongMain.WIDTH - 40;
@@ -17,6 +21,10 @@ public class Paddle
 		dy = 7;
 	}
 	
+	/**
+	 * Sets the Y position of the paddle
+	 * @param pos position of paddle
+	 */
 	public void setPos(int pos)
 	{
 		this.yPos = pos;
@@ -30,6 +38,10 @@ public class Paddle
 		}
 	}
 	
+	/**
+	 * Sets the hight of the paddle
+	 * @param height height of the paddle
+	 */
 	public void setHeight(int height)
 	{
 		this.height = height;
@@ -44,6 +56,10 @@ public class Paddle
 		}
 	}
 	
+	/**
+	 * Sets the dy value of the paddle
+	 * @param dy vertical amount that the paddle moves
+	 */
 	public void setDy(int dy)
 	{
 		this.dy = dy;
@@ -54,22 +70,36 @@ public class Paddle
 		}
 	}
 	
+	/**
+	 * @return Y position of the paddle
+	 */
 	public int getPos()
 	{
 		return yPos;
 	}
 	
+	/**
+	 * sets the score of the paddle
+	 * @param s score
+	 */
 	public void setScore(int s)
 	{
 		score = s;
 	}
 	
+	/**
+	 * @return the paddle's score
+	 */
 	public int getScore()
 	{
 		return score;
 	}
 	
-	//Will return true if the ball is in the paddle's borders, false otherwise.
+	/**
+	 * will return true if the ball is within the paddle's borders, false otherwise
+	 * @param ball the ball being detected by the paddle
+	 * @return
+	 */
 	public boolean canHitBall(Ball ball)
 	{
 		if ((this.getPos() - ball.diameter) <= ball.getY() && (this.getPos() + this.height) > ball.getY())
@@ -82,7 +112,11 @@ public class Paddle
 		}
 	}
 	
-	//checks to see if the ball has passed by or hit the paddle. Changes the ball's movement appropriately.
+	/**
+	 * Checks to see if the ball has passed by or hit the paddle. Changes the ball's movement appropriately.
+	 * Also updates the scores for each paddle.
+	 * @param ball
+	 */
 	public void checkHits(Ball ball)
 	{
 		if (position == "left")
@@ -164,7 +198,9 @@ public class Paddle
 		}
 	}
 	
-	//resets this paddle's score and height
+	/**
+	 * resets this paddle's score and height
+	 */
 	public void reset()
 	{
 		setScore(0);
