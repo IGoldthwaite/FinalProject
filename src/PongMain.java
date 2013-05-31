@@ -19,7 +19,7 @@ import javax.swing.Timer;
  */
 public class PongMain extends Frame implements KeyListener, ActionListener
 {
-	static boolean SINGLE_PLAYER = true, RIGHT_SERVE = false;	
+	static boolean SINGLE_PLAYER = false, RIGHT_SERVE = false;	
 	static Ball ball;
 	static HumanPaddle pLeft, pRight;
 	static AI pAI;
@@ -111,7 +111,7 @@ public class PongMain extends Frame implements KeyListener, ActionListener
 			graphics.fillOval(ball.getX(), ball.getY(), ball.diameter, ball.diameter);
 			graphics.setColor(Color.red);
 			//if the AI wins
-			if (pAI.getScore() >= 1 && !leftWin)
+			if (pAI.getScore() >= 5 && !leftWin)
 			{
 				rightWin = true;
 				graphics.drawString("YOU LOSE", (WIDTH / 2) - 70, 100);
@@ -119,7 +119,7 @@ public class PongMain extends Frame implements KeyListener, ActionListener
 				party = true;
 			}
 			//if the human player wins
-			else if (pLeft.getScore() >= 10 && !rightWin)
+			else if (pLeft.getScore() >= 5 && !rightWin)
 			{
 				leftWin = true;
 				graphics.drawString("YOU WIN", (WIDTH / 2) - 65, 100);
@@ -307,27 +307,16 @@ public class PongMain extends Frame implements KeyListener, ActionListener
 	{
 		char key = arg0.getKeyChar();
 		
-		if (SINGLE_PLAYER)
+		if (key == pLeft.upButton)
 		{
-			if (key == pLeft.upButton)
-			{
-				pLeft.up = true;
-			}
-			if (key == pLeft.downButton)
-			{
-				pLeft.down = true;
-			}
+			pLeft.up = true;
 		}
-		else
+		if (key == pLeft.downButton)
 		{
-			if (key == pLeft.upButton)
-			{
-				pLeft.up = true;
-			}
-			if (key == pLeft.downButton)
-			{
-				pLeft.down = true;
-			}
+			pLeft.down = true;
+		}
+		if (!SINGLE_PLAYER)
+		{
 			if (key == pRight.upButton)
 			{
 				pRight.up = true;
@@ -343,27 +332,17 @@ public class PongMain extends Frame implements KeyListener, ActionListener
 	{
 		char key = arg0.getKeyChar();
 		
-		if (SINGLE_PLAYER)
+		if (key == pLeft.upButton)
 		{
-			if (key == pLeft.upButton)
-			{
-				pLeft.up = false;
-			}
-			if (key == pLeft.downButton)
-			{
-				pLeft.down = false;
-			}
+			pLeft.up = false;
 		}
-		else
+		if (key == pLeft.downButton)
 		{
-			if (key == pLeft.upButton)
-			{
-				pLeft.up = false;
-			}
-			if (key == pLeft.downButton)
-			{
-				pLeft.down = false;
-			}
+			pLeft.down = false;
+		}
+		
+		if (!SINGLE_PLAYER)
+		{
 			if (key == pRight.upButton)
 			{
 				pRight.up = false;
